@@ -109,7 +109,7 @@
 <body>
 
 <div class="hdr">
-  <div><div class="ttl">Lock-in Tracker</div><div class="sub">June – August 2025</div></div>
+  <div><div class="ttl">Lock-in Tracker</div><div class="sub">June – August 2026</div></div>
   <div class="sync"><div class="dot off" id="dot"></div><span id="synclbl">Connecting...</span></div>
 </div>
 
@@ -156,16 +156,16 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 // ============================================================
 
 const PERSONS=[{name:'Linus',l:'L',color:'#007aff',bg:'#e5f1ff'},{name:'Tobias',l:'T',color:'#34c759',bg:'#e8f8ed'},{name:'Niklas',l:'N',color:'#ff9500',bg:'#fff3e0'}];
-const MONTHS=[{y:2025,m:5,n:'June'},{y:2025,m:6,n:'July'},{y:2025,m:7,n:'August'}];
+const MONTHS=[{y:2026,m:5,n:'June'},{y:2026,m:6,n:'July'},{y:2026,m:7,n:'August'}];
 const CE={gym:'🏋️',run:'🏃',other:'⚡'};const CL={gym:'Gym',run:'Run',other:'Other'};
-const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 const today=new Date();const TS=`${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
 let CU=0,MD=null,SRPE=null,SCAT=null;let db={};
 
 function dbk(pi,k){return `${pi}_${k}`;}
 function gw(pi,k){return db[dbk(pi,k)]||[];}
 function dim(y,m){return new Date(y,m+1,0).getDate();}
-function dow(y,m,d){return new Date(y,m,d).getDay();}
+function dow(y,m,d){return (new Date(y,m,d).getDay()+6)%7;}
 function ds(y,m,d){return `${y}-${m}-${d}`;}
 function rc(v){return !v?'#888':v<=3?'#34c759':v<=5?'#007aff':v<=7?'#ff9500':'#ff3b30';}
 function cnt(pi){return Object.entries(db).filter(([k])=>k.startsWith(pi+'_')).reduce((n,[,a])=>n+a.length,0);}
