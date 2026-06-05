@@ -232,7 +232,7 @@ function renderGrid(){
   MONTHS.forEach(({y,m,n})=>{
     h+=`<div class="month-cell">${n} ${y}</div>`;
     for(let d=1;d<=dim(y,m);d++){
-      const key=ds(y,m,d);const w=dow(y,m,d);const isWe=w===0||w===6;const isTd=key===TS;
+      const key=ds(y,m,d);const w=dow(y,m,d);const isWe=w===5||w===6;const isTd=key===TS;
       h+=`<div class="date-lbl${isWe?' we':''}${isTd?' td':''}"><div class="dl-dow">${DAYS[w]}</div><div class="dl-num">${d}</div></div>`;
       PERSONS.forEach((_,pi)=>{
         const ws=gw(pi,key);const can=pi===CU;
