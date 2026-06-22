@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAADn0lEQVR42u3dy3FbMRBFQYSkvfOPiy4l4IVJPmBw+lbN3iJPW39qLTMzM9uw15+fl0fBron5qfNoWyJ0MEzwQJjggTDRw2Cih8GED4IJHwQTPQwmfBBM+CCI30EgfAeC8B0I4ncQCN+BIH4HgfAdCOJ3EIjfQSB8B4L4HQTidxCI30EgfgeB+B0E4ncQiN9BIH4HgfgdBOJ3EIjfQSB+B4H4HQTidxAA4AAQv4NA/C6NwJPk0gg8QS4LwJPjsgg8Kf95v/M4zEfgCflH4O/O43g2AE/Gh4MHYg4CT8KD4YNwHgLhHzAAxJ8MH4S9CIT/AqEKQPwQZBEIH4Q0AvFDkAUg7EsHAQAAAND50Meu/jAJAAAAAAAAAMQPQPQrRQAAAID4ASh/rwAAAAAQPwDl7xYDAAAAAAz7DS4A9gPwQ26HhAXBHgQAHBQUAACMicm/fT4A//sfHBAA30cg/sPjgQCAo8IBGQAAALgCgI//AUgjEH8cQP29AAAAAAAAAEUAPv4HIP15AAAAAAAAAAAAAAAAAAAAgPiDAIpfCfKqz2EAXkYdAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALgBQO0BAKANAAIAvAcAwKoI/DaY+a0wfw3SqhD8MWxLI7gfgEEAgAFQBGAQAGAAAGAAAGAAdAAYBAAYANWXRzQA0i+OawAAMCwmAADIAKi8DQAA8HY0AABwRTTenjkAxiO4MRYAnosfAAAAAOC8UAAAAAAAHgEwGgEAALwbPwAAAADAeZEAAID3AAA8AmAsAgAA+ET8AAAAAAAAlAGMROA7wQB8Kn4AAAAAAD8NWgYwDsFNwZy6UvwAAJAHMAoBAAB8On4AAMgDGIMAAAC+ET8AAAAAAABlACMQAJAHsL45AABIAzgeAQBpAOuJAQBAGsDRCADIAlhPDwAAsvEDAEAewJEIAMgBWDsHAABpAMchACAFYJ0yAADIxg8AAHkAxyAAIAFgnToAAMjGDwAAeQDbEdjVANaUQSD+bPzbEdh1ANbEAQBAGsA2BHYVgDV9EIg/G/82BDYewLptEIg/Gz8E4s/H73MC4efj9yMTgs/HP+ZFtpz4IXDih8CJHwInfgic+CFw4ofAiR8EJ3wInPghcOIHwQkfAvEbCMI3CMRvIAjfQBC+QSB+A0H4BoLwDQbRGwjCNxCEbzCI3mAQvQEheANC8AaG0O1+NB4FM9uyv8JFymMNMTOjAAAAAElFTkSuQmCC"><link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAADn0lEQVR42u3dy3FbMRBFQYSkvfOPiy4l4IVJPmBw+lbN3iJPW39qLTMzM9uw15+fl0fBron5qfNoWyJ0MEzwQJjggTDRw2Cih8GED4IJHwQTPQwmfBBM+CCI30EgfAeC8B0I4ncQCN+BIH4HgfAdCOJ3EIjfQSB8B4L4HQTidxCI30EgfgeB+B0E4ncQiN9BIH4HgfgdBOJ3EIjfQSB+B4H4HQTidxAA4AAQv4NA/C6NwJPk0gg8QS4LwJPjsgg8Kf95v/M4zEfgCflH4O/O43g2AE/Gh4MHYg4CT8KD4YNwHgLhHzAAxJ8MH4S9CIT/AqEKQPwQZBEIH4Q0AvFDkAUg7EsHAQAAAND50Meu/jAJAAAAAAAAAMQPQPQrRQAAAID4ASh/rwAAAAAQPwDl7xYDAAAAAAz7DS4A9gPwQ26HhAXBHgQAHBQUAACMicm/fT4A//sfHBAA30cg/sPjgQCAo8IBGQAAALgCgI//AUgjEH8cQP29AAAAAAAAAEUAPv4HIP15AAAAAAAAAAAAAAAAAAAAgPiDAIpfCfKqz2EAXkYdAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALgBQO0BAKANAAIAvAcAwKoI/DaY+a0wfw3SqhD8MWxLI7gfgEEAgAFQBGAQAGAAAGAAAGAAdAAYBAAYANWXRzQA0i+OawAAMCwmAADIAKi8DQAA8HY0AABwRTTenjkAxiO4MRYAnosfAAAAAOC8UAAAAAAAHgEwGgEAALwbPwAAAADAeZEAAID3AAA8AmAsAgAA+ET8AAAAAAAAlAGMROA7wQB8Kn4AAAAAAD8NWgYwDsFNwZy6UvwAAJAHMAoBAAB8On4AAMgDGIMAAAC+ET8AAAAAAABlACMQAJAHsL45AABIAzgeAQBpAOuJAQBAGsDRCADIAlhPDwAAsvEDAEAewJEIAMgBWDsHAABpAMchACAFYJ0yAADIxg8AAHkAxyAAIAFgnToAAMjGDwAAeQDbEdjVANaUQSD+bPzbEdh1ANbEAQBAGsA2BHYVgDV9EIg/G/82BDYewLptEIg/Gz8E4s/H73MC4efj9yMTgs/HP+ZFtpz4IXDih8CJHwInfgic+CFw4ofAiR8EJ3wInPghcOIHwQkfAvEbCMI3CMRvIAjfQBC+QSB+A0H4BoLwDQbRGwjCNxCEbzCI3mAQvQEheANC8AaG0O1+NB4FM9uyv8JFymMNMTOjAAAAAElFTkSuQmCC">
 <title>Lock-in Tracker</title>
 
@@ -38,9 +41,9 @@
   @media(prefers-color-scheme:dark){.ps-btn.on{background:#f2f2f7;color:#1a1a1a;border-color:#f2f2f7;}}
 
   .stats{display:flex;gap:8px;padding:8px 1rem;border-bottom:.5px solid var(--border);}
-  .stat{flex:1;background:var(--bg2);border-radius:9px;padding:7px 10px;}
-  .stat-l{font-size:10px;color:var(--text2);margin-bottom:2px;}
-  .stat-v{font-size:16px;font-weight:600;}
+  .stat{flex:1;min-width:0;background:var(--bg2);border-radius:9px;padding:5px 6px;}
+  .stat-l{font-size:9px;color:var(--text2);margin-bottom:1px;}
+  .stat-v{font-size:14px;font-weight:600;}
 
   .badges{display:flex;gap:5px;flex-wrap:wrap;padding:7px 1rem;border-bottom:.5px solid var(--border);}
   .bdg{font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;}
@@ -49,13 +52,13 @@
 
   /* Grid */
   .grid-wrap{overflow-y:auto;-webkit-overflow-scrolling:touch;}
-  .grid{display:grid;grid-template-columns:64px repeat(3,1fr);min-width:0;}
+  .grid{display:grid;grid-template-columns:52px repeat(6,1fr);min-width:0;}
 
   .ch{position:sticky;top:0;z-index:10;background:var(--bg);border-bottom:.5px solid var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px;gap:3px;}
   .ch.dc{border-right:.5px solid var(--border);}
-  .ch-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
-  .ch-name{font-size:11px;font-weight:600;color:var(--text);}
-  .ch-cnt{font-size:10px;color:var(--text2);}
+  .ch-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;}
+  .ch-name{font-size:10px;font-weight:600;color:var(--text);}
+  .ch-cnt{font-size:9px;color:var(--text2);}
 
   .month-cell{grid-column:1/-1;background:var(--bg2);padding:4px 10px;font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--text2);border-bottom:.5px solid var(--border);}
 
@@ -68,9 +71,9 @@
   .wcell{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 2px;border-right:.5px solid var(--border);border-bottom:.5px solid var(--border);min-height:52px;transition:background .1s;}
   .wcell.cl{cursor:pointer;}.wcell.cl:active{opacity:.7;}
   .wcell.we{background:var(--bg2);}.wcell.td{background:var(--blue-light);}.wcell.hw{background:var(--green-light);}
-  .ck{width:20px;height:20px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;}
-  .ck svg{width:11px;height:11px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
-  .rpe-d{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;}
+  .ck{width:17px;height:17px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;}
+  .ck svg{width:9px;height:9px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+  .rpe-d{width:13px;height:13px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:#fff;}
   .cat-i{font-size:10px;line-height:1;}
   .multi{font-size:8px;font-weight:700;color:var(--green);background:var(--bg);border:1px solid var(--green);border-radius:5px;padding:1px 3px;line-height:1.3;}
 
@@ -118,6 +121,9 @@
   <button class="ps-btn on" onclick="setUser(0)">Linus</button>
   <button class="ps-btn" onclick="setUser(1)">Tobias</button>
   <button class="ps-btn" onclick="setUser(2)">Niklas</button>
+  <button class="ps-btn" onclick="setUser(3)">Emil</button>
+  <button class="ps-btn" onclick="setUser(4)">Sebastian</button>
+  <button class="ps-btn" onclick="setUser(5)">Edvin</button>
 </div>
 
 <div class="stats" id="stats"></div>
@@ -155,7 +161,7 @@ const SUPABASE_URL = 'https://tjvptsblqkirzsljgpup.supabase.co';  // <-- replace
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdnB0c2JscWtpcnpzbGpncHVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MDMxNjksImV4cCI6MjA5NTk3OTE2OX0.pFjR6NPFIIYyDhP2C-5tGMOgmNBkEKeBNOn5F1p8JmA';              // <-- replace
 // ============================================================
 
-const PERSONS=[{name:'Linus',l:'L',color:'#007aff',bg:'#e5f1ff'},{name:'Tobias',l:'T',color:'#34c759',bg:'#e8f8ed'},{name:'Niklas',l:'N',color:'#ff9500',bg:'#fff3e0'}];
+const PERSONS=[{name:'Linus',l:'L',color:'#007aff',bg:'#e5f1ff'},{name:'Tobias',l:'T',color:'#34c759',bg:'#e8f8ed'},{name:'Niklas',l:'N',color:'#ff9500',bg:'#fff3e0'},{name:'Emil',l:'E',color:'#af52de',bg:'#f5e6ff'},{name:'Sebastian',l:'S',color:'#ff2d55',bg:'#ffe5ea'},{name:'Edvin',l:'Ed',color:'#5ac8fa',bg:'#e0f7ff'}];
 const MONTHS=[{y:2026,m:5,n:'June'},{y:2026,m:6,n:'July'},{y:2026,m:7,n:'August'}];
 const CE={gym:'🏋️',run:'🏃',other:'⚡'};const CL={gym:'Gym',run:'Run',other:'Other'};
 const DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
