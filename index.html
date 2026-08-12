@@ -487,57 +487,32 @@ function renderComp() {
   const byWs  = [...overall].sort((a, b) => b.ws_count - a.ws_count);
   const byRpe = [...overall].sort((a, b) => b.rpe_sum - a.rpe_sum);
 
-  // Overall workouts
-  h += '<div class="comp-section">';
-  h += '<div class="comp-section-hdr"><div class="comp-section-title">💪 Total Workouts</div><div class="comp-section-sub">All time</div></div>';
-  // top 3 winners
   const wTrophies = ['🥇','🥈','🥉'];
-  byWs.slice(0, 3).forEach((p, i) => {
-    h += '<div class="comp-winner-row">'
-      + '<div class="comp-trophy">' + wTrophies[i] + '</div>'
-      + '<div class="comp-av" style="background:' + p.bg + ';color:' + p.color + '">' + p.l + '</div>'
-      + '<div class="comp-info"><div class="comp-name">' + p.name + '</div></div>'
-      + '<div class="comp-score" style="color:' + p.color + '">' + p.ws_count + '</div>'
-      + '</div>';
-  });
-  h += '<div class="comp-divider"></div>';
-  byWs.forEach((p, i) => {
-    const pct = Math.round(p.ws_count / maxWs * 100);
-    h += '<div class="comp-all-row">'
-      + '<div class="comp-rank">' + (i + 1) + '</div>'
-      + '<div class="comp-av" style="background:' + p.bg + ';color:' + p.color + ';width:22px;height:22px;font-size:9px;">' + p.l + '</div>'
-      + '<div style="font-size:11px;font-weight:500;color:var(--text);width:64px;flex-shrink:0;">' + p.name + '</div>'
-      + '<div class="comp-bar-wrap"><div class="comp-bar" style="width:' + pct + '%;background:' + p.color + '"></div></div>'
-      + '<div class="comp-val">' + p.ws_count + '</div>'
-      + '</div>';
-  });
-  h += '</div>';
+  function overallSection(title, sub, sorted, maxVal, valFn) {
+    let s = '<div class="comp-section">';
+    s += '<div class="comp-section-hdr"><div class="comp-section-title">' + title + '</div><div class="comp-section-sub">' + sub + '</div></div>';
+    s += '<div>';
+    sorted.slice(0,3).forEach((p, i) => {
+      const v = valFn(p);
+      const pct = Math.round(v / Math.max(valFn(sorted[0]), 1) * 100);
+      const trophy = i < 3 ? wTrophies[i] : '';
+      s += '<div style="display:flex;align-items:center;gap:8px;padding:6px 12px;border-bottom:.5px solid var(--border);">'
+        + '<div style="width:20px;text-align:center;font-size:' + (i<3?'15':'10') + 'px;color:var(--text2);flex-shrink:0;">' + (trophy||('#'+(i+1))) + '</div>'
+        + '<div style="width:26px;height:26px;border-radius:50%;background:' + p.bg + ';color:' + p.color + ';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">' + p.l + '</div>'
+        + '<div style="font-size:12px;font-weight:500;color:var(--text);width:70px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + p.name + '</div>'
+        + '<div style="flex:1;background:var(--bg3);border-radius:4px;height:5px;overflow:hidden;">'
+        + '<div style="width:' + pct + '%;height:100%;background:' + p.color + ';border-radius:4px;"></div></div>'
+        + '<div style="font-size:12px;font-weight:700;color:' + p.color + ';min-width:32px;text-align:right;flex-shrink:0;">' + v + '</div>'
+        + '</div>';
+    });
+    s += '</div></div>';
+    return s;
+  }
 
-  // Overall RPE
-  h += '<div class="comp-section">';
-  h += '<div class="comp-section-hdr"><div class="comp-section-title">⚡ Total RPE</div><div class="comp-section-sub">Sum of all logged RPE</div></div>';
-  byRpe.slice(0, 3).forEach((p, i) => {
-    h += '<div class="comp-winner-row">'
-      + '<div class="comp-trophy">' + wTrophies[i] + '</div>'
-      + '<div class="comp-av" style="background:' + p.bg + ';color:' + p.color + '">' + p.l + '</div>'
-      + '<div class="comp-info"><div class="comp-name">' + p.name + '</div></div>'
-      + '<div class="comp-score" style="color:' + p.color + '">' + p.rpe_sum + '</div>'
-      + '</div>';
-  });
-  h += '<div class="comp-divider"></div>';
-  byRpe.forEach((p, i) => {
-    const pct = Math.round(p.rpe_sum / maxRpe * 100);
-    h += '<div class="comp-all-row">'
-      + '<div class="comp-rank">' + (i + 1) + '</div>'
-      + '<div class="comp-av" style="background:' + p.bg + ';color:' + p.color + ';width:22px;height:22px;font-size:9px;">' + p.l + '</div>'
-      + '<div style="font-size:11px;font-weight:500;color:var(--text);width:64px;flex-shrink:0;">' + p.name + '</div>'
-      + '<div class="comp-bar-wrap"><div class="comp-bar" style="width:' + pct + '%;background:' + p.color + '"></div></div>'
-      + '<div class="comp-val">' + p.rpe_sum + '</div>'
-      + '</div>';
-  });
-  h += '</div>';
+  h += overallSection('💪 Total Workouts', 'All time', byWs, maxWs, p => p.ws_count);
+  h += overallSection('⚡ Total RPE', 'Sum of all logged RPE', byRpe, maxRpe, p => p.rpe_sum);
 
-  // Average RPE — only count workouts where RPE was logged
+  // Average RPE
   const withAvg = PERSONS.map((p, pi) => {
     const allW = Object.entries(db)
       .filter(([k]) => k.startsWith(pi + '_'))
@@ -550,26 +525,21 @@ function renderComp() {
 
   h += '<div class="comp-section">';
   h += '<div class="comp-section-hdr"><div class="comp-section-title">🎯 Average RPE</div><div class="comp-section-sub">Per session with RPE logged</div></div>';
-  byAvg.slice(0, 3).forEach((p, i) => {
-    h += '<div class="comp-winner-row">'
-      + '<div class="comp-trophy">' + wTrophies[i] + '</div>'
-      + '<div class="comp-av" style="background:' + p.bg + ';color:' + p.color + '">' + p.l + '</div>'
-      + '<div class="comp-info"><div class="comp-name">' + p.name + '</div><div class="comp-detail">' + p.rpe_logged + ' sessions with RPE</div></div>'
-      + '<div class="comp-score" style="color:' + p.color + '">' + (p.avg > 0 ? p.avg.toFixed(1) : '—') + '</div>'
-      + '</div>';
-  });
-  h += '<div class="comp-divider"></div>';
-  byAvg.forEach((p, i) => {
+  h += '<div>';
+  byAvg.slice(0,3).forEach((p, i) => {
     const pct = Math.round(p.avg / maxAvg * 100);
-    h += '<div class="comp-all-row">'
-      + '<div class="comp-rank">' + (i + 1) + '</div>'
-      + '<div class="comp-av" style="background:' + p.bg + ';color:' + p.color + ';width:22px;height:22px;font-size:9px;">' + p.l + '</div>'
-      + '<div style="font-size:11px;font-weight:500;color:var(--text);width:64px;flex-shrink:0;">' + p.name + '</div>'
-      + '<div class="comp-bar-wrap"><div class="comp-bar" style="width:' + pct + '%;background:' + p.color + '"></div></div>'
-      + '<div class="comp-val">' + (p.avg > 0 ? p.avg.toFixed(1) : '—') + '</div>'
+    const trophy = i < 3 ? wTrophies[i] : '';
+    const val = p.avg > 0 ? p.avg.toFixed(1) : '—';
+    h += '<div style="display:flex;align-items:center;gap:8px;padding:6px 12px;border-bottom:.5px solid var(--border);">'
+      + '<div style="width:20px;text-align:center;font-size:' + (i<3?'15':'10') + 'px;color:var(--text2);flex-shrink:0;">' + (trophy||('#'+(i+1))) + '</div>'
+      + '<div style="width:26px;height:26px;border-radius:50%;background:' + p.bg + ';color:' + p.color + ';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">' + p.l + '</div>'
+      + '<div style="font-size:12px;font-weight:500;color:var(--text);width:70px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + p.name + '</div>'
+      + '<div style="flex:1;background:var(--bg3);border-radius:4px;height:5px;overflow:hidden;">'
+      + '<div style="width:' + pct + '%;height:100%;background:' + p.color + ';border-radius:4px;"></div></div>'
+      + '<div style="font-size:12px;font-weight:700;color:' + p.color + ';min-width:32px;text-align:right;flex-shrink:0;">' + val + '</div>'
       + '</div>';
   });
-  h += '</div>';
+  h += '</div></div>';
 
   // ── Per month ──
   MONTHS.forEach(({ y, m, n }) => {
