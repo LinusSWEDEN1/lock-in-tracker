@@ -491,7 +491,7 @@ function renderComp() {
   function overallSection(title, sub, sorted, maxVal, valFn) {
     let s = '<div class="comp-section">';
     s += '<div class="comp-section-hdr"><div class="comp-section-title">' + title + '</div><div class="comp-section-sub">' + sub + '</div></div>';
-    s += '<div>';
+    s += '<div style="padding-bottom:12px;">';
     sorted.slice(0,3).forEach((p, i) => {
       const v = valFn(p);
       const pct = Math.round(v / Math.max(valFn(sorted[0]), 1) * 100);
@@ -525,7 +525,7 @@ function renderComp() {
 
   h += '<div class="comp-section">';
   h += '<div class="comp-section-hdr"><div class="comp-section-title">🎯 Average RPE</div><div class="comp-section-sub">Per session with RPE logged</div></div>';
-  h += '<div>';
+  h += '<div style="padding-bottom:12px;">';
   byAvg.slice(0,3).forEach((p, i) => {
     const pct = Math.round(p.avg / maxAvg * 100);
     const trophy = i < 3 ? wTrophies[i] : '';
@@ -551,7 +551,7 @@ function renderComp() {
 
     const mTrophies = ['🥇','🥈','🥉'];
     const rowH = 28; // px per row
-    const scrollH = Math.min(mByWs.length, 8) * rowH + 32; // show ~8 rows + header
+    const scrollH = 3 * rowH + 8; // exactly 3 rows, no scroll needed
 
     h += '<div class="comp-section">';
     h += '<div class="comp-section-hdr"><div class="comp-section-title">📅 ' + n + '</div></div>';
@@ -560,8 +560,8 @@ function renderComp() {
     // Left — workouts
     h += '<div style="flex:1;min-width:0;border-right:.5px solid var(--border);">';
     h += '<div style="padding:5px 8px;font-size:10px;font-weight:600;color:var(--text2);border-bottom:.5px solid var(--border);">💪 Workouts</div>';
-    h += '<div style="max-height:' + scrollH + 'px;overflow-y:auto;-webkit-overflow-scrolling:touch;">';
-    mByWs.forEach((p, i) => {
+    h += '<div style="padding-bottom:12px;">';
+    mByWs.slice(0,3).forEach((p, i) => {
       const pct = Math.round(p.workouts / mMaxWs * 100);
       const trophy = i < 3 ? mTrophies[i] : '';
       h += '<div style="display:flex;align-items:center;gap:4px;padding:4px 8px;border-bottom:.5px solid var(--border);">'
@@ -578,8 +578,8 @@ function renderComp() {
     // Right — RPE
     h += '<div style="flex:1;min-width:0;">';
     h += '<div style="padding:5px 8px;font-size:10px;font-weight:600;color:var(--text2);border-bottom:.5px solid var(--border);">⚡ Total RPE</div>';
-    h += '<div style="max-height:' + scrollH + 'px;overflow-y:auto;-webkit-overflow-scrolling:touch;">';
-    mByRpe.forEach((p, i) => {
+    h += '<div style="padding-bottom:12px;">';
+    mByRpe.slice(0,3).forEach((p, i) => {
       const pct = Math.round(p.rpe / mMaxRpe * 100);
       const trophy = i < 3 ? mTrophies[i] : '';
       h += '<div style="display:flex;align-items:center;gap:4px;padding:4px 8px;border-bottom:.5px solid var(--border);">'
