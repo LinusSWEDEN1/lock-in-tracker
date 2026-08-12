@@ -537,6 +537,40 @@ function renderComp() {
   });
   h += '</div>';
 
+  // Average RPE — only count workouts where RPE was logged
+  const withAvg = PERSONS.map((p, pi) => {
+    const allW = Object.entries(db)
+      .filter(([k]) => k.startsWith(pi + '_'))
+      .flatMap(([, a]) => a.filter(w => w.rpe && w.rpe > 0));
+    const avg = allW.length ? Math.round((allW.reduce((s, w) => s + w.rpe, 0) / allW.length) * 10) / 10 : 0;
+    return { ...p, pi, avg, rpe_logged: allW.length };
+  });
+  const byAvg = [...withAvg].sort((a, b) => b.avg - a.avg);
+  const maxAvg = Math.max(...byAvg.map(p => p.avg), 1);
+
+  h += '<div class="comp-section">';
+  h += '<div class="comp-section-hdr"><div class="comp-section-title">🎯 Average RPE</div><div class="comp-section-sub">Per session with RPE logged</div></div>';
+  byAvg.slice(0, 3).forEach((p, i) => {
+    h += '<div class="comp-winner-row">'
+      + '<div class="comp-trophy">' + wTrophies[i] + '</div>'
+      + '<div class="comp-av" style="background:' + p.bg + ';color:' + p.color + '">' + p.l + '</div>'
+      + '<div class="comp-info"><div class="comp-name">' + p.name + '</div><div class="comp-detail">' + p.rpe_logged + ' sessions with RPE</div></div>'
+      + '<div class="comp-score" style="color:' + p.color + '">' + (p.avg > 0 ? p.avg.toFixed(1) : '—') + '</div>'
+      + '</div>';
+  });
+  h += '<div class="comp-divider"></div>';
+  byAvg.forEach((p, i) => {
+    const pct = Math.round(p.avg / maxAvg * 100);
+    h += '<div class="comp-all-row">'
+      + '<div class="comp-rank">' + (i + 1) + '</div>'
+      + '<div class="comp-av" style="background:' + p.bg + ';color:' + p.color + ';width:22px;height:22px;font-size:9px;">' + p.l + '</div>'
+      + '<div style="font-size:11px;font-weight:500;color:var(--text);width:64px;flex-shrink:0;">' + p.name + '</div>'
+      + '<div class="comp-bar-wrap"><div class="comp-bar" style="width:' + pct + '%;background:' + p.color + '"></div></div>'
+      + '<div class="comp-val">' + (p.avg > 0 ? p.avg.toFixed(1) : '—') + '</div>'
+      + '</div>';
+  });
+  h += '</div>';
+
   // ── Per month ──
   MONTHS.forEach(({ y, m, n }) => {
     const monthStats = PERSONS.map((p, pi) => ({ ...p, pi, ...getMonthStats(pi, y, m) }));
@@ -545,51 +579,49 @@ function renderComp() {
     const mMaxWs  = Math.max(...monthStats.map(p => p.workouts), 1);
     const mMaxRpe = Math.max(...monthStats.map(p => p.rpe), 1);
 
+    const mTrophies = ['🥇','🥈','🥉'];
+    const rowH = 28; // px per row
+    const scrollH = Math.min(mByWs.length, 8) * rowH + 32; // show ~8 rows + header
+
     h += '<div class="comp-section">';
     h += '<div class="comp-section-hdr"><div class="comp-section-title">📅 ' + n + '</div></div>';
     h += '<div style="display:flex;">';
 
     // Left — workouts
     h += '<div style="flex:1;min-width:0;border-right:.5px solid var(--border);">';
-    h += '<div style="padding:6px 8px;font-size:10px;font-weight:600;color:var(--text2);border-bottom:.5px solid var(--border);">💪 Workouts</div>';
-    h += '<div style="padding:6px 8px;display:flex;align-items:center;gap:5px;border-bottom:.5px solid var(--border);">'
-      + '<div style="font-size:13px;">🥇</div>'
-      + '<div style="width:20px;height:20px;border-radius:50%;background:' + mByWs[0].bg + ';color:' + mByWs[0].color + ';display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0;">' + mByWs[0].l + '</div>'
-      + '<div style="font-size:11px;font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + mByWs[0].name + '</div>'
-      + '<div style="font-size:13px;font-weight:700;color:' + mByWs[0].color + ';flex-shrink:0;">' + mByWs[0].workouts + '</div>'
-      + '</div>';
+    h += '<div style="padding:5px 8px;font-size:10px;font-weight:600;color:var(--text2);border-bottom:.5px solid var(--border);">💪 Workouts</div>';
+    h += '<div style="max-height:' + scrollH + 'px;overflow-y:auto;-webkit-overflow-scrolling:touch;">';
     mByWs.forEach((p, i) => {
       const pct = Math.round(p.workouts / mMaxWs * 100);
+      const trophy = i < 3 ? mTrophies[i] : '';
       h += '<div style="display:flex;align-items:center;gap:4px;padding:4px 8px;border-bottom:.5px solid var(--border);">'
-        + '<div style="font-size:9px;color:var(--text2);width:12px;flex-shrink:0;">' + (i+1) + '</div>'
-        + '<div style="font-size:9px;font-weight:500;color:var(--text);width:44px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0;">' + p.name + '</div>'
-        + '<div style="flex:1;background:var(--bg3);border-radius:3px;height:4px;overflow:hidden;">'
+        + '<div style="font-size:9px;width:16px;flex-shrink:0;text-align:center;">' + (trophy || (i+1)) + '</div>'
+        + '<div style="width:20px;height:20px;border-radius:50%;background:' + p.bg + ';color:' + p.color + ';display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0;">' + p.l + '</div>'
+        + '<div style="font-size:9px;font-weight:500;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + p.name + '</div>'
+        + '<div style="flex:0 0 30px;background:var(--bg3);border-radius:3px;height:4px;overflow:hidden;margin:0 3px;">'
         + '<div style="width:' + pct + '%;height:100%;background:' + p.color + ';border-radius:3px;"></div></div>'
-        + '<div style="font-size:9px;font-weight:600;color:var(--text);min-width:16px;text-align:right;flex-shrink:0;">' + p.workouts + '</div>'
+        + '<div style="font-size:9px;font-weight:600;color:var(--text);min-width:14px;text-align:right;flex-shrink:0;">' + p.workouts + '</div>'
         + '</div>';
     });
-    h += '</div>';
+    h += '</div></div>';
 
     // Right — RPE
     h += '<div style="flex:1;min-width:0;">';
-    h += '<div style="padding:6px 8px;font-size:10px;font-weight:600;color:var(--text2);border-bottom:.5px solid var(--border);">⚡ Total RPE</div>';
-    h += '<div style="padding:6px 8px;display:flex;align-items:center;gap:5px;border-bottom:.5px solid var(--border);">'
-      + '<div style="font-size:13px;">🥇</div>'
-      + '<div style="width:20px;height:20px;border-radius:50%;background:' + mByRpe[0].bg + ';color:' + mByRpe[0].color + ';display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0;">' + mByRpe[0].l + '</div>'
-      + '<div style="font-size:11px;font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + mByRpe[0].name + '</div>'
-      + '<div style="font-size:13px;font-weight:700;color:' + mByRpe[0].color + ';flex-shrink:0;">' + mByRpe[0].rpe + '</div>'
-      + '</div>';
+    h += '<div style="padding:5px 8px;font-size:10px;font-weight:600;color:var(--text2);border-bottom:.5px solid var(--border);">⚡ Total RPE</div>';
+    h += '<div style="max-height:' + scrollH + 'px;overflow-y:auto;-webkit-overflow-scrolling:touch;">';
     mByRpe.forEach((p, i) => {
       const pct = Math.round(p.rpe / mMaxRpe * 100);
+      const trophy = i < 3 ? mTrophies[i] : '';
       h += '<div style="display:flex;align-items:center;gap:4px;padding:4px 8px;border-bottom:.5px solid var(--border);">'
-        + '<div style="font-size:9px;color:var(--text2);width:12px;flex-shrink:0;">' + (i+1) + '</div>'
-        + '<div style="font-size:9px;font-weight:500;color:var(--text);width:44px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0;">' + p.name + '</div>'
-        + '<div style="flex:1;background:var(--bg3);border-radius:3px;height:4px;overflow:hidden;">'
+        + '<div style="font-size:9px;width:16px;flex-shrink:0;text-align:center;">' + (trophy || (i+1)) + '</div>'
+        + '<div style="width:20px;height:20px;border-radius:50%;background:' + p.bg + ';color:' + p.color + ';display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0;">' + p.l + '</div>'
+        + '<div style="font-size:9px;font-weight:500;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + p.name + '</div>'
+        + '<div style="flex:0 0 30px;background:var(--bg3);border-radius:3px;height:4px;overflow:hidden;margin:0 3px;">'
         + '<div style="width:' + pct + '%;height:100%;background:' + p.color + ';border-radius:3px;"></div></div>'
-        + '<div style="font-size:9px;font-weight:600;color:var(--text);min-width:16px;text-align:right;flex-shrink:0;">' + p.rpe + '</div>'
+        + '<div style="font-size:9px;font-weight:600;color:var(--text);min-width:14px;text-align:right;flex-shrink:0;">' + p.rpe + '</div>'
         + '</div>';
     });
-    h += '</div>';
+    h += '</div></div>';
 
     h += '</div>'; // end side-by-side
     h += '</div>'; // end section
