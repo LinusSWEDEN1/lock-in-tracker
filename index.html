@@ -86,6 +86,31 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);height:100vh;he
 .lb-cell.td{background:var(--blue-light);}
 .lb-cell.hw{background:var(--green-light);}
 
+
+/* ══════════════════════════════════
+   TAB 2 — COMPETITION
+══════════════════════════════════ */
+.comp-wrap{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:1rem;display:flex;flex-direction:column;gap:1rem;}
+.comp-section{background:var(--bg2);border-radius:14px;overflow:hidden;}
+.comp-section-hdr{padding:10px 14px;border-bottom:.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.comp-section-title{font-size:13px;font-weight:700;color:var(--text);}
+.comp-section-sub{font-size:11px;color:var(--text2);}
+.comp-winner-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:.5px solid var(--border);}
+.comp-winner-row:last-child{border-bottom:none;}
+.comp-trophy{font-size:18px;width:28px;text-align:center;flex-shrink:0;}
+.comp-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.comp-info{flex:1;min-width:0;}
+.comp-name{font-size:13px;font-weight:600;color:var(--text);}
+.comp-detail{font-size:11px;color:var(--text2);margin-top:1px;}
+.comp-score{font-size:16px;font-weight:700;text-align:right;flex-shrink:0;}
+.comp-divider{height:.5px;background:var(--border);margin:0 14px;}
+.comp-all-row{display:flex;align-items:center;gap:8px;padding:7px 14px;border-bottom:.5px solid var(--border);}
+.comp-all-row:last-child{border-bottom:none;}
+.comp-rank{font-size:11px;color:var(--text2);width:18px;flex-shrink:0;font-weight:600;}
+.comp-bar-wrap{flex:1;background:var(--bg3);border-radius:4px;height:6px;overflow:hidden;}
+.comp-bar{height:100%;border-radius:4px;transition:width .3s;}
+.comp-val{font-size:11px;font-weight:600;color:var(--text);min-width:28px;text-align:right;}
+
 /* ══════════════════════════════════
    TAB 2 — LOG
 ══════════════════════════════════ */
@@ -170,7 +195,8 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);height:100vh;he
 
 <div class="tabs">
   <div class="tab on" onclick="switchTab(0)">🏆 Leaderboard</div>
-  <div class="tab" onclick="switchTab(1)">📝 Log workout</div>
+  <div class="tab" onclick="switchTab(1)">🥊 Competition</div>
+  <div class="tab" onclick="switchTab(2)">📝 Log workout</div>
 </div>
 
 <!-- TAB 1: LEADERBOARD -->
@@ -182,7 +208,13 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);height:100vh;he
   </div>
 </div>
 
-<!-- TAB 2: LOG -->
+
+<!-- TAB 2: COMPETITION -->
+<div class="page" id="page-comp">
+  <div class="comp-wrap" id="comp-wrap"></div>
+</div>
+
+<!-- TAB 3: LOG -->
 <div class="page" id="page-log">
   <div class="log-pick">
     <div class="log-pick-lbl">Who are you?</div>
@@ -304,6 +336,7 @@ function switchTab(t){
   currentTab=t;
   document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('on',i===t));
   document.querySelectorAll('.page').forEach((el,i)=>el.classList.toggle('on',i===t));
+  if(t===1)renderComp();
 }
 
 // ── Cell HTML ──
@@ -425,8 +458,149 @@ function renderLogGrid(){
   el.innerHTML=h;
 }
 
+
+// ── Competition ──
+function getMonthStats(pi, y, m) {
+  let workouts = 0, rpe = 0;
+  for (let d = 1; d <= dim(y, m); d++) {
+    const ws = gw(pi, ds(y, m, d));
+    workouts += ws.length;
+    rpe += ws.reduce((s, w) => s + (w.rpe || 0), 0);
+  }
+  return { workouts, rpe };
+}
+
+function renderComp() {
+  const el = document.getElementById('comp-wrap');
+  let h = '';
+
+  // ── Overall totals ──
+  const overall = PERSONS.map((p, pi) => {
+    const ws_count = Object.entries(db).filter(([k]) => k.startsWith(pi + '_')).reduce((n, [, a]) => n + a.length, 0);
+    const rpe_sum = Object.entries(db).filter(([k]) => k.startsWith(pi + '_')).reduce((n, [, a]) => n + a.reduce((s, w) => s + (w.rpe || 0), 0), 0);
+    return { ...p, pi, ws_count, rpe_sum };
+  });
+
+  const maxWs = Math.max(...overall.map(p => p.ws_count), 1);
+  const maxRpe = Math.max(...overall.map(p => p.rpe_sum), 1);
+
+  const byWs  = [...overall].sort((a, b) => b.ws_count - a.ws_count);
+  const byRpe = [...overall].sort((a, b) => b.rpe_sum - a.rpe_sum);
+
+  // Overall workouts
+  h += '<div class="comp-section">';
+  h += '<div class="comp-section-hdr"><div class="comp-section-title">💪 Total Workouts</div><div class="comp-section-sub">All time</div></div>';
+  // top 3 winners
+  const wTrophies = ['🥇','🥈','🥉'];
+  byWs.slice(0, 3).forEach((p, i) => {
+    h += '<div class="comp-winner-row">'
+      + '<div class="comp-trophy">' + wTrophies[i] + '</div>'
+      + '<div class="comp-av" style="background:' + p.bg + ';color:' + p.color + '">' + p.l + '</div>'
+      + '<div class="comp-info"><div class="comp-name">' + p.name + '</div></div>'
+      + '<div class="comp-score" style="color:' + p.color + '">' + p.ws_count + '</div>'
+      + '</div>';
+  });
+  h += '<div class="comp-divider"></div>';
+  byWs.forEach((p, i) => {
+    const pct = Math.round(p.ws_count / maxWs * 100);
+    h += '<div class="comp-all-row">'
+      + '<div class="comp-rank">' + (i + 1) + '</div>'
+      + '<div class="comp-av" style="background:' + p.bg + ';color:' + p.color + ';width:22px;height:22px;font-size:9px;">' + p.l + '</div>'
+      + '<div style="font-size:11px;font-weight:500;color:var(--text);width:64px;flex-shrink:0;">' + p.name + '</div>'
+      + '<div class="comp-bar-wrap"><div class="comp-bar" style="width:' + pct + '%;background:' + p.color + '"></div></div>'
+      + '<div class="comp-val">' + p.ws_count + '</div>'
+      + '</div>';
+  });
+  h += '</div>';
+
+  // Overall RPE
+  h += '<div class="comp-section">';
+  h += '<div class="comp-section-hdr"><div class="comp-section-title">⚡ Total RPE</div><div class="comp-section-sub">Sum of all logged RPE</div></div>';
+  byRpe.slice(0, 3).forEach((p, i) => {
+    h += '<div class="comp-winner-row">'
+      + '<div class="comp-trophy">' + wTrophies[i] + '</div>'
+      + '<div class="comp-av" style="background:' + p.bg + ';color:' + p.color + '">' + p.l + '</div>'
+      + '<div class="comp-info"><div class="comp-name">' + p.name + '</div></div>'
+      + '<div class="comp-score" style="color:' + p.color + '">' + p.rpe_sum + '</div>'
+      + '</div>';
+  });
+  h += '<div class="comp-divider"></div>';
+  byRpe.forEach((p, i) => {
+    const pct = Math.round(p.rpe_sum / maxRpe * 100);
+    h += '<div class="comp-all-row">'
+      + '<div class="comp-rank">' + (i + 1) + '</div>'
+      + '<div class="comp-av" style="background:' + p.bg + ';color:' + p.color + ';width:22px;height:22px;font-size:9px;">' + p.l + '</div>'
+      + '<div style="font-size:11px;font-weight:500;color:var(--text);width:64px;flex-shrink:0;">' + p.name + '</div>'
+      + '<div class="comp-bar-wrap"><div class="comp-bar" style="width:' + pct + '%;background:' + p.color + '"></div></div>'
+      + '<div class="comp-val">' + p.rpe_sum + '</div>'
+      + '</div>';
+  });
+  h += '</div>';
+
+  // ── Per month ──
+  MONTHS.forEach(({ y, m, n }) => {
+    const monthStats = PERSONS.map((p, pi) => ({ ...p, pi, ...getMonthStats(pi, y, m) }));
+    const mByWs  = [...monthStats].sort((a, b) => b.workouts - a.workouts);
+    const mByRpe = [...monthStats].sort((a, b) => b.rpe - a.rpe);
+    const mMaxWs  = Math.max(...monthStats.map(p => p.workouts), 1);
+    const mMaxRpe = Math.max(...monthStats.map(p => p.rpe), 1);
+
+    h += '<div class="comp-section">';
+    h += '<div class="comp-section-hdr"><div class="comp-section-title">📅 ' + n + '</div></div>';
+    h += '<div style="display:flex;">';
+
+    // Left — workouts
+    h += '<div style="flex:1;min-width:0;border-right:.5px solid var(--border);">';
+    h += '<div style="padding:6px 8px;font-size:10px;font-weight:600;color:var(--text2);border-bottom:.5px solid var(--border);">💪 Workouts</div>';
+    h += '<div style="padding:6px 8px;display:flex;align-items:center;gap:5px;border-bottom:.5px solid var(--border);">'
+      + '<div style="font-size:13px;">🥇</div>'
+      + '<div style="width:20px;height:20px;border-radius:50%;background:' + mByWs[0].bg + ';color:' + mByWs[0].color + ';display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0;">' + mByWs[0].l + '</div>'
+      + '<div style="font-size:11px;font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + mByWs[0].name + '</div>'
+      + '<div style="font-size:13px;font-weight:700;color:' + mByWs[0].color + ';flex-shrink:0;">' + mByWs[0].workouts + '</div>'
+      + '</div>';
+    mByWs.forEach((p, i) => {
+      const pct = Math.round(p.workouts / mMaxWs * 100);
+      h += '<div style="display:flex;align-items:center;gap:4px;padding:4px 8px;border-bottom:.5px solid var(--border);">'
+        + '<div style="font-size:9px;color:var(--text2);width:12px;flex-shrink:0;">' + (i+1) + '</div>'
+        + '<div style="font-size:9px;font-weight:500;color:var(--text);width:44px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0;">' + p.name + '</div>'
+        + '<div style="flex:1;background:var(--bg3);border-radius:3px;height:4px;overflow:hidden;">'
+        + '<div style="width:' + pct + '%;height:100%;background:' + p.color + ';border-radius:3px;"></div></div>'
+        + '<div style="font-size:9px;font-weight:600;color:var(--text);min-width:16px;text-align:right;flex-shrink:0;">' + p.workouts + '</div>'
+        + '</div>';
+    });
+    h += '</div>';
+
+    // Right — RPE
+    h += '<div style="flex:1;min-width:0;">';
+    h += '<div style="padding:6px 8px;font-size:10px;font-weight:600;color:var(--text2);border-bottom:.5px solid var(--border);">⚡ Total RPE</div>';
+    h += '<div style="padding:6px 8px;display:flex;align-items:center;gap:5px;border-bottom:.5px solid var(--border);">'
+      + '<div style="font-size:13px;">🥇</div>'
+      + '<div style="width:20px;height:20px;border-radius:50%;background:' + mByRpe[0].bg + ';color:' + mByRpe[0].color + ';display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0;">' + mByRpe[0].l + '</div>'
+      + '<div style="font-size:11px;font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + mByRpe[0].name + '</div>'
+      + '<div style="font-size:13px;font-weight:700;color:' + mByRpe[0].color + ';flex-shrink:0;">' + mByRpe[0].rpe + '</div>'
+      + '</div>';
+    mByRpe.forEach((p, i) => {
+      const pct = Math.round(p.rpe / mMaxRpe * 100);
+      h += '<div style="display:flex;align-items:center;gap:4px;padding:4px 8px;border-bottom:.5px solid var(--border);">'
+        + '<div style="font-size:9px;color:var(--text2);width:12px;flex-shrink:0;">' + (i+1) + '</div>'
+        + '<div style="font-size:9px;font-weight:500;color:var(--text);width:44px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0;">' + p.name + '</div>'
+        + '<div style="flex:1;background:var(--bg3);border-radius:3px;height:4px;overflow:hidden;">'
+        + '<div style="width:' + pct + '%;height:100%;background:' + p.color + ';border-radius:3px;"></div></div>'
+        + '<div style="font-size:9px;font-weight:600;color:var(--text);min-width:16px;text-align:right;flex-shrink:0;">' + p.rpe + '</div>'
+        + '</div>';
+    });
+    h += '</div>';
+
+    h += '</div>'; // end side-by-side
+    h += '</div>'; // end section
+  });
+
+  el.innerHTML = h;
+}
+
 function render(){
   renderLeaderboard();
+  renderComp();
   renderPersonGrid();
   renderLogGrid();
 }
