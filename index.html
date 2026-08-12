@@ -49,7 +49,7 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);height:100vh;he
    TAB 1 — LEADERBOARD
 ══════════════════════════════════ */
 .lb-top{flex-shrink:0;padding:8px 1rem;border-bottom:.5px solid var(--border);}
-.badges{display:flex;gap:5px;flex-wrap:wrap;}
+.badges{display:flex;gap:5px;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px;}
 .bdg{font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;}
 .bdg.on{background:var(--gold-bg);color:var(--gold);border:.5px solid var(--gold);}
 .bdg.off{background:var(--bg2);border:.5px solid var(--border);color:var(--text2);}
@@ -175,7 +175,6 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);height:100vh;he
 
 <!-- TAB 1: LEADERBOARD -->
 <div class="page on" id="page-lb">
-  <div class="lb-top"><div class="badges" id="badges"></div></div>
   <div class="lb-wrap">
     <div class="lb-scroll">
       <div class="lb-grid" id="lb-grid"></div>
@@ -427,7 +426,6 @@ function renderLogGrid(){
 }
 
 function render(){
-  renderBadges();
   renderLeaderboard();
   renderPersonGrid();
   renderLogGrid();
